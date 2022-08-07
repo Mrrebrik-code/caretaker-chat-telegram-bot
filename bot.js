@@ -15,7 +15,19 @@ bot.on('text', (ctx) => {
         let checkWord = checkingCommandWords(ctx.message.text)
 
         if(checkWord.isAdd == true){
-            ctx.reply(`Я добавил слово "${checkWord.word}"`);
+            console.log(ctx.message);
+            if(ctx.message.from.id == "954148035"){
+                ctx.reply(`Отец! Я добавил очень плохое слово "${checkWord.word}"`, {
+                    reply_to_message_id: ctx.message.message_id
+                });
+            }
+            else{
+                ctx.reply(`Я добавил очень плохое слово "${checkWord.word}"`, {
+                    reply_to_message_id: ctx.message.message_id
+                });
+            }
+            
+            //ctx.reply(`Я добавил слово "${checkWord.word}"`);
         }else{
             ctx.reply(`Я удалил слово "${checkWord.word}"`);
         }
@@ -43,7 +55,7 @@ function checkingCommandWords(inputCheck){
         isAdd: isCheckingSymbol,
         word: word
     }
-    
+
     return data
 }
 
@@ -65,6 +77,18 @@ bot.on('new_chat_members', async (ctx) => {
 
     
     console.log(ctx.message.new_chat_members)
+});
+
+
+//Закрепил сообщение
+bot.on('pinned_message', (ctx) => {
+    ctx.reply(`asdasd`);
+    console.log(ctx.message.pinned_message);
+});
+
+bot.on('forward_from_chat', (ctx) => {
+    ctx.reply(`forward_from_chat`);
+    console.log(ctx.message.forward_from_chat);
 });
 
 //Пользователь покинул чат
