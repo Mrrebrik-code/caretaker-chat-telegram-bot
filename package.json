@@ -5,6 +5,7 @@
     "@supabase/supabase-js": "^1.33.3",
     "dotenv": "^16.0.0",
     "node-telegram-bot-api": "^0.52.0",
+    "nodemon": "^2.0.19",
     "telegraf": "^4.7.0"
   },
   "main": "index.js",
