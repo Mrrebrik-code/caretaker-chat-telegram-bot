@@ -7,8 +7,42 @@ const bot = new Telegraf(process.env.TOKEN_BOT);
 
 //Прослушивание сообщений в чате
 bot.on('text', (ctx) => {
-    console.log(ctx);
-    ctx.reply(`Hello ${ctx.message.text}`)
+
+    if(ctx.message.text.includes("/forbidden")){
+        console.log("test");
+        let isChecking = false;
+        let isCheckingSymbol = false;
+        let word = "";
+
+        for (var i = 0; i <  ctx.message.text.length; i++){
+            if(isChecking == true){
+                if(ctx.message.text[i] == "+"){
+                    isCheckingSymbol = true;
+                }
+                else if(ctx.message.text[i] == "-"){
+                    isCheckingSymbol = false;
+                }
+                else{
+                    word += ctx.message.text[i];
+                }
+            }
+
+            if(isChecking == false && ctx.message.text[i] == " "){
+                isChecking = true;
+            }    
+        }
+
+
+        if(isCheckingSymbol){
+            ctx.reply(`Я добавил слово "${word}"`);
+        }else{
+            ctx.reply(`Я удалил слово "${word}"`);
+        }
+    }
+    else{
+        console.log("test2");
+    }
+
 });
 
 //Новый пользователь в чате
@@ -34,7 +68,7 @@ bot.on('new_chat_members', async (ctx) => {
 //Пользователь покинул чат
 bot.on('left_chat_member', (ctx) => {
     ctx.reply(`Ну и пошел он лесом :) Нам и без него хорошо!`);
-    
+
     console.log(ctx.message.left_chat_member)
 });
 

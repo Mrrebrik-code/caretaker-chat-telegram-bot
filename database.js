@@ -29,4 +29,30 @@ module.exports = class database{
 
         return Boolean(userData.data.length);
     }
+
+    async addForbiddenWord(wordText){
+        let supabase = this.supabase;
+
+        let wordData = await supabase
+        .from('words')
+        .insert(
+        [ 
+            { 
+                word: wordText
+            }
+        ]);
+
+        return Boolean(wordData.data.length);
+    }
+
+    async removeForbiddenWord(wordText){
+        let supabase = this.supabase;
+
+        let wordData = await supabase
+        .from('words')
+        .delete()
+        .eq('word', wordText)
+
+        return Boolean(wordData.data.length);
+    }
 }
