@@ -13,6 +13,8 @@ bot.on('text', (ctx) => {
 
 //Новый пользователь в чате
 bot.on('new_chat_members', async (ctx) => {
+
+    //Объект пользователя для базы данных
     let user = {
         id: ctx.message.new_chat_members[0].id,
         firstname: ctx.message.new_chat_members[0].first_name,
@@ -20,6 +22,7 @@ bot.on('new_chat_members', async (ctx) => {
     }
     let check = await db.addNewUser(user);
 
+    //Если успешно добавлено в базу данных
     if(check == true){
         ctx.reply(`Добро пожаловать в чат!`);
     }
@@ -31,6 +34,7 @@ bot.on('new_chat_members', async (ctx) => {
 //Пользователь покинул чат
 bot.on('left_chat_member', (ctx) => {
     ctx.reply(`Ну и пошел он лесом :) Нам и без него хорошо!`);
+    
     console.log(ctx.message.left_chat_member)
 });
 

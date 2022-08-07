@@ -22,7 +22,8 @@ module.exports = class database{
                 muteData: "false",
                 userReportCount: 0,
                 wordReportCount: 0,
-                countHelp: 0
+                countHelp: 0,
+                status: "joined"
             }
         ]);
 
