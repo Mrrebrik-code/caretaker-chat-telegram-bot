@@ -1,0 +1,24 @@
+{
+  "name": "caretaker-chat-telegram-bot",
+  "version": "0.0.1",
+  "dependencies": {
+    "@supabase/supabase-js": "^1.33.3",
+    "dotenv": "^16.0.0",
+    "node-telegram-bot-api": "^0.52.0",
+    "telegraf": "^4.7.0"
+  },
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Mrrebrik-code/caretaker-chat-telegram-bot.git"
+  },
+  "author": "Mrrebrik",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Mrrebrik-code/caretaker-chat-telegram-bot/issues"
+  },
+  "homepage": "https://github.com/Mrrebrik-code/caretaker-chat-telegram-bot#readme"
+}
