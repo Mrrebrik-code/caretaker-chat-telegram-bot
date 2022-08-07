@@ -8,6 +8,8 @@ const bot = new Telegraf(process.env.TOKEN_BOT);
 //Прослушивание сообщений в чате
 bot.on('text', (ctx) => {
 
+
+    //Проверяем на то, ввел ли пользовтель команду добавления/удаления запрещенного пользователя
     if(ctx.message.text.includes("/forbidden")){
 
         let checkWord = checkingCommandWords(ctx.message.text)
@@ -21,6 +23,7 @@ bot.on('text', (ctx) => {
 
 });
 
+//Проверка на добавление/удаление запрещенного слова
 function checkingCommandWords(inputCheck){
     let isChecking = false;
     let isCheckingSymbol = false;
@@ -28,26 +31,19 @@ function checkingCommandWords(inputCheck){
 
     for (var i = 0; i <  inputCheck.length; i++){
         if(isChecking == true){
-            if(inputCheck[i] == "+"){
-                isCheckingSymbol = true;
-            }
-            else if(inputCheck[i] == "-"){
-                isCheckingSymbol = false;
-            }
-            else{
-                word += inputCheck[i];
-            }
+            if(inputCheck[i] == "+")  isCheckingSymbol = true;   //Если + стоит пред словом, значит добавляем
+            else if(inputCheck[i] == "-")  isCheckingSymbol = false; //Если + стоит пред словом, значит удаляем
+            else word += inputCheck[i];
         }
 
-        if(isChecking == false && inputCheck[i] == " "){
-            isChecking = true;
-        }    
+        if(isChecking == false && inputCheck[i] == " ") isChecking = true;
     }
 
     let data = {
         isAdd: isCheckingSymbol,
         word: word
     }
+    
     return data
 }
 
