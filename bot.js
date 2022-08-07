@@ -9,41 +9,47 @@ const bot = new Telegraf(process.env.TOKEN_BOT);
 bot.on('text', (ctx) => {
 
     if(ctx.message.text.includes("/forbidden")){
-        console.log("test");
-        let isChecking = false;
-        let isCheckingSymbol = false;
-        let word = "";
 
-        for (var i = 0; i <  ctx.message.text.length; i++){
-            if(isChecking == true){
-                if(ctx.message.text[i] == "+"){
-                    isCheckingSymbol = true;
-                }
-                else if(ctx.message.text[i] == "-"){
-                    isCheckingSymbol = false;
-                }
-                else{
-                    word += ctx.message.text[i];
-                }
-            }
+        let checkWord = checkingCommandWords(ctx.message.text)
 
-            if(isChecking == false && ctx.message.text[i] == " "){
-                isChecking = true;
-            }    
-        }
-
-
-        if(isCheckingSymbol){
-            ctx.reply(`Я добавил слово "${word}"`);
+        if(checkWord.isAdd == true){
+            ctx.reply(`Я добавил слово "${checkWord.word}"`);
         }else{
-            ctx.reply(`Я удалил слово "${word}"`);
+            ctx.reply(`Я удалил слово "${checkWord.word}"`);
         }
-    }
-    else{
-        console.log("test2");
     }
 
 });
+
+function checkingCommandWords(inputCheck){
+    let isChecking = false;
+    let isCheckingSymbol = false;
+    let word = "";
+
+    for (var i = 0; i <  inputCheck.length; i++){
+        if(isChecking == true){
+            if(inputCheck[i] == "+"){
+                isCheckingSymbol = true;
+            }
+            else if(inputCheck[i] == "-"){
+                isCheckingSymbol = false;
+            }
+            else{
+                word += inputCheck[i];
+            }
+        }
+
+        if(isChecking == false && inputCheck[i] == " "){
+            isChecking = true;
+        }    
+    }
+
+    let data = {
+        isAdd: isCheckingSymbol,
+        word: word
+    }
+    return data
+}
 
 //Новый пользователь в чате
 bot.on('new_chat_members', async (ctx) => {
