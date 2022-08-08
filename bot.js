@@ -99,7 +99,39 @@ bot.on('text', async (ctx) => {
     
             if(ctx.message.text.toLowerCase().includes(words[i].toLowerCase()) == true){
                 ctx.telegram.deleteMessage(ctx.chat.id, ctx.message.message_id);
-                ctx.reply(`"@${ctx.message.from.username}" -> Вы испольозвали запрещенное слово: "${words[i]}". У вас добавлено одно прогрешение [1/3]`);
+
+                let countWordReport = await db.getWordReportCountUserId(ctx.message.from.id);
+                countWordReport += 1;
+
+                await db.setWordReportCountUserId(ctx.message.from.id, countWordReport);
+
+                let timeMute = 0;
+                if(countWordReport == 3){
+                    timeMute = 1;
+
+                }else if(countWordReport == 6){
+                    timeMute = 2;
+                }else if(countWordReport == 9){
+                    timeMute = 3;
+                }
+
+                if(timeMute > 0){
+                    let addTime = generationCurrentDateAddMinutes(new Date(), timeMute);
+                    let userMuteTime = await db.addTimeMuteFromUser(ctx.message.from.id, addTime)
+                    ctx.reply(`"@${ctx.message.from.username}" -> Вам дали мут на ${timeMute}мин. В следующий раз будет больше!`);
+                }
+
+                let maxCount = 3;
+
+                if(countWordReport >= 4){
+                    maxCount = 6;
+                }
+                if(countWordReport >= 7){
+                    maxCount = 9;
+                }
+                
+
+                ctx.reply(`"@${ctx.message.from.username}" -> Вы испольозвали запрещенное слово: "${words[i]}". У вас добавлено одно прогрешение [${countWordReport}/${maxCount}]`);
             }
         }
         isDeleteMessage = false;

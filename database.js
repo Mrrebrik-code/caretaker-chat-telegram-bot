@@ -110,4 +110,28 @@ module.exports = class database{
         
         return userData.data[0].muteData;
     }
+
+    async getWordReportCountUserId(userId){
+        let supabase = this.supabase;
+
+        let userData = await supabase
+        .from('users-chat')
+        .select('wordReportCount')
+        .eq('userId', userId);
+        
+        console.log(userData.data[0].wordReportCount);
+        return userData.data[0].wordReportCount;
+    }
+
+    async setWordReportCountUserId(userId, count){
+        let supabase = this.supabase;
+
+        let userData = await supabase
+        .from('users-chat')
+        .update({ "wordReportCount": count })
+        .eq('userId', userId)
+
+        console.log(userData.data);
+        return Boolean(userData.data.length);
+    }
 }
