@@ -25,6 +25,8 @@ bot.on('text', async (ctx) => {
         if(tes == false){
             ctx.telegram.deleteMessage(ctx.chat.id, ctx.message.message_id);
             return;
+        } else{
+            let clearMute = await db.addTimeMuteFromUser(ctx.message.from.id, "false")
         }
     }
     
