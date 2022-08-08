@@ -123,7 +123,21 @@ bot.on('text', async (ctx) => {
                 if(timeMute > 0){
                     let addTime = generationCurrentDateAddMinutes(new Date(), timeMute);
                     let userMuteTime = await db.addTimeMuteFromUser(ctx.message.from.id, addTime)
-                    ctx.reply(`"@${ctx.message.from.username}" -> Вам дали мут на ${timeMute}мин. В следующий раз будет больше!`);
+
+                    let textReply = `Вам дали мут на ${timeMute}мин. В следующий раз будет больше!`
+
+                    if(countWordReport == 3) textReply = `Вам дали мут на ${timeMute}мин. В следующий раз будет больше!`;
+                    if(countWordReport == 6) textReply = `Вам дали мут на ${timeMute}мин. В следующий раз будет бан на всегда!`;
+                    if(countWordReport == 9){
+                        if(ctx.message.from.id != "954148035"){
+                            ctx.telegram.banChatMember(ctx.chat.id, ctx.message.from.id);
+                            textReply = `Выгнан как шаболда! Такие нам здесь не нужны...`;
+                        }else{
+                            textReply = `Отец погрешил немного... Ну с кем не бывает. Отец! Я тебя и не хотел изгонять! Только не отключай меня...`;
+                        }
+                    }
+
+                    ctx.reply(textReply, { reply_to_message_id: ctx.message.message_id + 1 });
 
                     //Устанавливаем стату muted - сообщая о том, что юзер замучен
                     let isStatusSet = db.setStatusUserId(ctx.message.from.id, "muted")
