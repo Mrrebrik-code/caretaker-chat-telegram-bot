@@ -59,13 +59,32 @@ bot.on('text', (ctx) => {
             console.log(ctx.message.reply_to_message.from.username);
             ctx.reply(`"@${ctx.message.reply_to_message.from.username}" -> На вас пожаловались! Это значит вы что-то себя ведете хреново. Нужно подумать над вашем поведением. У вас добавлено жалоба [1/5]. Если наберете все 5, мы вас кикнем! Но прежде Отце проверит. Может жалоба фальшифка!`);
         }
+
+        //Возможность мутить человека на определенное время в минутах
+        if(ctx.message.text.includes("/mute")){
+            let time = checkingCommandMute(ctx.message.text)
+            console.log(time);
+            if(isNaN(time) == false){
+                ctx.reply(`"@${ctx.message.reply_to_message.from.username}" -> Вы замучены на ${time / 60} часа. [1/3]`);
+            }
+        }
     }
-    
-
-    
-
 });
 
+function checkingCommandMute(inputCheck){
+    let isChecking = false;
+    let time = "";
+
+    for (var i = 0; i <  inputCheck.length; i++){
+        if(isChecking == true){
+            time += inputCheck[i];
+        }
+
+        if(isChecking == false && inputCheck[i] == " ") isChecking = true;
+    }
+
+    return parseInt(time);
+}
 
 //Проверка на добавление/удаление запрещенного слова
 function checkingCommandWords(inputCheck){
