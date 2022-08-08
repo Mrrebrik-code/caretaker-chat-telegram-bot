@@ -10,16 +10,16 @@ const words = ["Война", "Жопа", "Свинья"];
 //Прослушивание сообщений в чате
 bot.on('text', (ctx) => {
     //Проверяем на то, ввел ли пользовтель команду добавления/удаления запрещенного пользователя
-
     let isDeleteMessage = true;
 
+    
     if(ctx.message.text.includes("/forbidden")){
 
         let checkWord = checkingCommandWords(ctx.message.text)
 
         if(checkWord.isAdd == true){
             isDeleteMessage = false;
-            
+
             //TODO Сделать добавление в базу данных
             if(ctx.message.from.id == "954148035"){
                 ctx.reply(`Отец! Я добавил очень плохое слово "${checkWord.word}"`, {
@@ -38,7 +38,7 @@ bot.on('text', (ctx) => {
         }
     }
 
-
+    //Удаление сообщений запрещенных
     if(isDeleteMessage == true){
         for(let i = 0; i < words.length; i++){
             if(ctx.message.text == "" || ctx.message.text == null) continue;
@@ -48,12 +48,24 @@ bot.on('text', (ctx) => {
                 ctx.reply(`"@${ctx.message.from.username}" -> Вы испольозвали запрещенное слово: "${words[i]}". У вас добавлено одно прогрешение [1/3]`);
             }
         }
+        isDeleteMessage = false;
+    }
+
+    //Ответ на сообещние пользователя
+    if(ctx.message.reply_to_message != null && isDeleteMessage == false){
+
+        //Подать жалобу на игрока
+        if(ctx.message.text.includes("/report")){
+            console.log(ctx.message.reply_to_message.from.username);
+            ctx.reply(`"@${ctx.message.reply_to_message.from.username}" -> На вас пожаловались! Это значит вы что-то себя ведете хреново. Нужно подумать над вашем поведением. У вас добавлено жалоба [1/5]. Если наберете все 5, мы вас кикнем! Но прежде Отце проверит. Может жалоба фальшифка!`);
+        }
     }
     
 
     
 
 });
+
 
 //Проверка на добавление/удаление запрещенного слова
 function checkingCommandWords(inputCheck){
@@ -81,7 +93,7 @@ function checkingCommandWords(inputCheck){
 
 //Новый пользователь в чате
 bot.on('new_chat_members', async (ctx) => {
-
+  
     //Объект пользователя для базы данных
     let user = {
         id: ctx.message.new_chat_members[0].id,
@@ -106,9 +118,9 @@ bot.on('pinned_message', (ctx) => {
     console.log(ctx.message.pinned_message);
 });
 
-bot.on('forward_from_chat', (ctx) => {
-    ctx.reply(`forward_from_chat`);
-    console.log(ctx.message.forward_from_chat);
+bot.on('reply_to_message', (ctx) => {
+    ctx.reply(`reply_to_message`);
+    console.log(ctx.message.reply_to_message);
 });
 
 //Пользователь покинул чат
