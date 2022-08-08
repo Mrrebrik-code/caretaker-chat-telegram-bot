@@ -159,19 +159,29 @@ function checkingCommandWords(inputCheck){
 
 //Новый пользователь в чате
 bot.on('new_chat_members', async (ctx) => {
-  
+
+   
     //Объект пользователя для базы данных
     let user = {
         id: ctx.message.new_chat_members[0].id,
         firstname: ctx.message.new_chat_members[0].first_name,
         username: ctx.message.new_chat_members[0].username
     }
-    let check = await db.addNewUser(user);
 
-    //Если успешно добавлено в базу данных
-    if(check == true){
-        ctx.reply(`Добро пожаловать в чат!`);
+    let checkUser = await db.trySearchUserId(user.id);
+
+    if(checkUser == true){
+        ctx.reply(`О, какие люди! С возвращением! А мы уже думали что не вернетесь :)`);
     }
+    else{
+        let check = await db.addNewUser(user);
+
+        //Если успешно добавлено в базу данных
+        if(check == true){
+            ctx.reply(`Добро пожаловать в чат!`);
+        }
+    }
+    
 
     
     console.log(ctx.message.new_chat_members)
