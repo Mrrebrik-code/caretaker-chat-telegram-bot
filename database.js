@@ -52,6 +52,17 @@ module.exports = class database{
         return Boolean(user.data.length);
     }
 
+    async setStatusUserId(userId, status){
+        let supabase = this.supabase;
+
+        let user = await supabase
+        .from('users-chat')
+        .update({ "status": status })
+        .eq('userId', userId)
+
+        return Boolean(user.data.length);
+    }
+
     async addForbiddenWord(wordText){
         let supabase = this.supabase;
 
