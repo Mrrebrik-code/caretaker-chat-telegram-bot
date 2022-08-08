@@ -106,32 +106,31 @@ bot.on('text', async (ctx) => {
                 await db.setWordReportCountUserId(ctx.message.from.id, countWordReport);
 
                 let timeMute = 0;
-                if(countWordReport == 3){
-                    timeMute = 1;
 
-                }else if(countWordReport == 6){
-                    timeMute = 2;
-                }else if(countWordReport == 9){
-                    timeMute = 3;
-                }
+                //Даем мут, если прегрешений много в этом шансе
+                if(countWordReport == 3)        timeMute = 1;
+                else if(countWordReport == 6)   timeMute = 2;
+                else if(countWordReport == 9)   timeMute = 3;
+
+                let maxCount = 3;
+                let punishment = "Мут на 2 часа!";
+
+                if(countWordReport >= 4) { maxCount = 6; punishment = "Мут на 24 часа!"; }
+                if(countWordReport >= 7) { maxCount = 9; punishment = "Бан на всегда!"; }
+
+                ctx.reply(`@${ctx.message.from.username} -> Вы испольозвали запрещенное слово: "${words[i]}". У вас добавлено одно прогрешение [${countWordReport}/${maxCount}]. Наказнание будет: ${punishment}`);
 
                 if(timeMute > 0){
                     let addTime = generationCurrentDateAddMinutes(new Date(), timeMute);
                     let userMuteTime = await db.addTimeMuteFromUser(ctx.message.from.id, addTime)
                     ctx.reply(`"@${ctx.message.from.username}" -> Вам дали мут на ${timeMute}мин. В следующий раз будет больше!`);
-                }
 
-                let maxCount = 3;
-
-                if(countWordReport >= 4){
-                    maxCount = 6;
+                    //Устанавливаем стату muted - сообщая о том, что юзер замучен
+                    let isStatusSet = db.setStatusUserId(ctx.message.from.id, "muted")
+                    if(isStatusSet){
+                         console.log(`UserId: ${ctx.message.from.id} - status muted`);
+                    }
                 }
-                if(countWordReport >= 7){
-                    maxCount = 9;
-                }
-                
-
-                ctx.reply(`"@${ctx.message.from.username}" -> Вы испольозвали запрещенное слово: "${words[i]}". У вас добавлено одно прогрешение [${countWordReport}/${maxCount}]`);
             }
         }
         isDeleteMessage = false;
