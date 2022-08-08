@@ -30,6 +30,28 @@ module.exports = class database{
         return Boolean(userData.data.length);
     }
 
+    async getUserFromId(userId){
+        let supabase = this.supabase;
+
+        let userData = await supabase
+        .from('users-chat')
+        .select('userId, firstName, userName, countMessages, muteData, userReportCount, wordReportCount, countHelp, status')
+        .eq('userId', userId);
+        
+        return userData.data[0];
+    }
+
+    async trySearchUserId(userId){
+        let supabase = this.supabase;
+
+        let user = await supabase
+        .from('users-chat')
+        .select('userId')
+        .eq('userId', userId);
+
+        return Boolean(user.data.length);
+    }
+
     async addForbiddenWord(wordText){
         let supabase = this.supabase;
 
