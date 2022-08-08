@@ -10,9 +10,36 @@ const words = ["Война", "Жопа", "Свинья"];
 
 //Прослушивание сообщений в чате
 bot.on('text', async (ctx) => {
-    //Проверяем на то, ввел ли пользовтель команду добавления/удаления запрещенного пользователя
+    
+    let isUserToDatabase = await db.trySearchUserId(ctx.message.from.id);
+
+    if(isUserToDatabase == false){
+        let user = {
+            id: ctx.message.from.id,
+            firstname: ctx.message.from.first_name,
+            username: ctx.message.from.username
+        }
+
+        let check = await db.addNewUser(user);
+
+        //Если успешно добавлено в базу данных
+        if(check == true){
+            let isStatusSet = db.setStatusUserId(user.id, "joined")
+            if(isStatusSet){
+                console.log(`UserId: ${user.id} - status joined to database`);
+            }
+            ctx.reply(`Вы явно дольше находитесь в этом чате. Это очень уважительно. Спасибо, что вы являетесь частью нашего чата! Я вас занес в базу данных.`, 
+            {
+                reply_to_message_id: ctx.message.message_id
+            });
+        }
+    }
+
+
+    //Разрешено ли удалаять сообщения
     let isDeleteMessage = true;
 
+    //Делаем проверку, нет ли мута у пользователя
     let date = await db.getTimeMuteUser(ctx.message.from.id)
     if(date != "false"){
         var dateUser = moment(date);
@@ -21,13 +48,15 @@ bot.on('text', async (ctx) => {
         console.log(dateUser);
         console.log(currentDate);
     
+        //Сравниваем время в муте и текущее время. 
+        //Если время в мете меньше текущего, то даем написать сообщение.
         var tes = moment(dateUser).isBefore(currentDate); 
         if(tes == false){
             ctx.telegram.deleteMessage(ctx.chat.id, ctx.message.message_id);
             return;
         } else{
 
-             //Устанавливаем стату joined - сообщая о том, что юзер размучен и имеет все права, как и обычный вступивший
+            //Устанавливаем стату joined - сообщая о том, что юзер размучен и имеет все права, как и обычный вступивший
             let isStatusSet = db.setStatusUserId(ctx.message.from.id, "joined")
             if(isStatusSet){
                  console.log(`UserId: ${ctx.message.from.id} - status unmuted`);
@@ -36,9 +65,8 @@ bot.on('text', async (ctx) => {
             let clearMute = await db.addTimeMuteFromUser(ctx.message.from.id, "false")
         }
     }
-    
 
-    
+    //Проверяем на то, ввел ли пользовтель команду добавления/удаления запрещенного пользователя
     if(ctx.message.text.includes("/forbidden")){
 
         let checkWord = checkingCommandWords(ctx.message.text)
@@ -57,8 +85,6 @@ bot.on('text', async (ctx) => {
                     reply_to_message_id: ctx.message.message_id
                 });
             }
-            
-            //ctx.reply(`Я добавил слово "${checkWord.word}"`);
         }else{
             ctx.reply(`Я удалил слово "${checkWord.word}"`);
         }
