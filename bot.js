@@ -26,6 +26,13 @@ bot.on('text', async (ctx) => {
             ctx.telegram.deleteMessage(ctx.chat.id, ctx.message.message_id);
             return;
         } else{
+
+             //Устанавливаем стату joined - сообщая о том, что юзер размучен и имеет все права, как и обычный вступивший
+            let isStatusSet = db.setStatusUserId(ctx.message.from.id, "joined")
+            if(isStatusSet){
+                 console.log(`UserId: ${ctx.message.from.id} - status unmuted`);
+            }
+
             let clearMute = await db.addTimeMuteFromUser(ctx.message.from.id, "false")
         }
     }
@@ -92,6 +99,12 @@ bot.on('text', async (ctx) => {
 
                 if(userMuteTime == true){
                     ctx.reply(`"@${ctx.message.reply_to_message.from.username}" -> Вы замучены на ${time}мин. [1/3]`);
+
+                    //Устанавливаем стату muted - сообщая о том, что юзер замучен
+                    let isStatusSet = db.setStatusUserId(ctx.message.reply_to_message.from.id, "muted")
+                    if(isStatusSet){
+                         console.log(`UserId: ${ctx.message.reply_to_message.from.id} - status muted`);
+                    }
                 }
                 
             }
@@ -181,7 +194,12 @@ bot.on('new_chat_members', async (ctx) => {
             ctx.reply(`Добро пожаловать в чат!`);
         }
     }
-    
+
+    //Устанавливаем стату joined - сообщая о том, что юзер вступил
+    let isStatusSet = db.setStatusUserId(user.id, "joined")
+    if(isStatusSet){
+        console.log(`UserId: ${user.id} - status joined`);
+    }
 
     
     console.log(ctx.message.new_chat_members)
@@ -201,6 +219,14 @@ bot.on('reply_to_message', (ctx) => {
 
 //Пользователь покинул чат
 bot.on('left_chat_member', (ctx) => {
+
+    //Устанавливаем стату leaved - сообщая о том, что юзер вышел
+    let isStatusSet = db.setStatusUserId(ctx.message.left_chat_member.id, "leaved")
+
+    if(isStatusSet){
+        console.log(`UserId: ${ctx.message.left_chat_member.id} - status leaved`);
+    }
+
     ctx.reply(`Ну и пошел он лесом :) Нам и без него хорошо!`);
 
     console.log(ctx.message.left_chat_member)
