@@ -55,4 +55,27 @@ module.exports = class database{
 
         return Boolean(wordData.data.length);
     }
+
+    async addTimeMuteFromUser(idUser, time){
+        let supabase = this.supabase;
+
+        let userData = await supabase
+        .from('users-chat')
+        .update({ "muteData": time })
+        .eq('userId', idUser)
+
+        console.log(userData.data);
+        return Boolean(userData.data.length);
+    }
+
+    async getTimeMuteUser(idUser){
+        let supabase = this.supabase;
+
+        let userData = await supabase
+        .from('users-chat')
+        .select('muteData')
+        .eq('userId', idUser);
+        
+        return userData.data[0].muteData;
+    }
 }

@@ -1,6 +1,7 @@
 require("dotenv").config();
 const database = require("./database.js");
 const { Telegraf, Markup, Scenes, Stage, session } = require('telegraf');
+const moment = require('moment-timezone');
 
 const db = new database();
 const bot = new Telegraf(process.env.TOKEN_BOT);
@@ -8,9 +9,25 @@ const bot = new Telegraf(process.env.TOKEN_BOT);
 const words = ["Война", "Жопа", "Свинья"];
 
 //Прослушивание сообщений в чате
-bot.on('text', (ctx) => {
+bot.on('text', async (ctx) => {
     //Проверяем на то, ввел ли пользовтель команду добавления/удаления запрещенного пользователя
     let isDeleteMessage = true;
+
+    let date = await db.getTimeMuteUser(ctx.message.from.id)
+    if(date != "false"){
+        var dateUser = moment(date);
+        var currentDate = moment(new Date());
+    
+        console.log(dateUser);
+        console.log(currentDate);
+    
+        var tes = moment(dateUser).isBefore(currentDate); 
+        if(tes == false){
+            ctx.telegram.deleteMessage(ctx.chat.id, ctx.message.message_id);
+            return;
+        }
+    }
+    
 
     
     if(ctx.message.text.includes("/forbidden")){
@@ -37,6 +54,8 @@ bot.on('text', (ctx) => {
             ctx.reply(`Я удалил слово "${checkWord.word}"`);
         }
     }
+
+    
 
     //Удаление сообщений запрещенных
     if(isDeleteMessage == true){
@@ -65,12 +84,38 @@ bot.on('text', (ctx) => {
             let time = checkingCommandMute(ctx.message.text)
             console.log(time);
             if(isNaN(time) == false){
-                ctx.reply(`"@${ctx.message.reply_to_message.from.username}" -> Вы замучены на ${time / 60} часа. [1/3]`);
+                let addTime = generationCurrentDateAddMinutes(new Date(), time);
+
+                let userMuteTime = await db.addTimeMuteFromUser(ctx.message.reply_to_message.from.id, addTime)
+
+                if(userMuteTime == true){
+                    ctx.reply(`"@${ctx.message.reply_to_message.from.username}" -> Вы замучены на ${time / 60} часа. [1/3]`);
+                }
+                
             }
         }
     }
 });
 
+    //Сгенерировать текущую дату и добавить к ней количество минут
+    //Выдат дату в определенном формате: "YYYY-MM-DD HH:mm:ss [GMT]ZZ"
+    function generationCurrentDateAddMinutes(date, addTime) {
+
+        date.setTime(date.getTime() + (addTime * 60 * 1000));
+        date.setHours(date.getHours());
+        var addTime = date, zone = "Asia/Tomsk";
+        var m = moment(addTime);
+
+        moment.fn.zoneName = function () {
+            var abbr = this.zoneAbbr();
+            return abbrs[abbr] || abbr;
+        };
+
+        console.log(m.format('YYYY-MM-DD HH:mm:ss [GMT]ZZ'));
+        return m.format('YYYY-MM-DD HH:mm:ss [GMT]ZZ');
+      }
+
+//Проверка на добавление времени к муту пользователя
 function checkingCommandMute(inputCheck){
     let isChecking = false;
     let time = "";
