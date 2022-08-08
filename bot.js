@@ -89,7 +89,7 @@ bot.on('text', async (ctx) => {
                 let userMuteTime = await db.addTimeMuteFromUser(ctx.message.reply_to_message.from.id, addTime)
 
                 if(userMuteTime == true){
-                    ctx.reply(`"@${ctx.message.reply_to_message.from.username}" -> Вы замучены на ${time / 60} часа. [1/3]`);
+                    ctx.reply(`"@${ctx.message.reply_to_message.from.username}" -> Вы замучены на ${time}мин. [1/3]`);
                 }
                 
             }
@@ -140,7 +140,7 @@ function checkingCommandWords(inputCheck){
     for (var i = 0; i <  inputCheck.length; i++){
         if(isChecking == true){
             if(inputCheck[i] == "+")  isCheckingSymbol = true;   //Если + стоит пред словом, значит добавляем
-            else if(inputCheck[i] == "-")  isCheckingSymbol = false; //Если + стоит пред словом, значит удаляем
+            else if(inputCheck[i] == "-")  isCheckingSymbol = false; //Если - стоит пред словом, значит удаляем
             else word += inputCheck[i];
         }
 
