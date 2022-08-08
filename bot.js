@@ -5,17 +5,22 @@ const { Telegraf, Markup, Scenes, Stage, session } = require('telegraf');
 const db = new database();
 const bot = new Telegraf(process.env.TOKEN_BOT);
 
+const words = ["Война", "Жопа", "Свинья"];
+
 //Прослушивание сообщений в чате
 bot.on('text', (ctx) => {
-
-
     //Проверяем на то, ввел ли пользовтель команду добавления/удаления запрещенного пользователя
+
+    let isDeleteMessage = true;
+
     if(ctx.message.text.includes("/forbidden")){
 
         let checkWord = checkingCommandWords(ctx.message.text)
 
         if(checkWord.isAdd == true){
-            console.log(ctx.message);
+            isDeleteMessage = false;
+            
+            //TODO Сделать добавление в базу данных
             if(ctx.message.from.id == "954148035"){
                 ctx.reply(`Отец! Я добавил очень плохое слово "${checkWord.word}"`, {
                     reply_to_message_id: ctx.message.message_id
@@ -32,6 +37,21 @@ bot.on('text', (ctx) => {
             ctx.reply(`Я удалил слово "${checkWord.word}"`);
         }
     }
+
+
+    if(isDeleteMessage == true){
+        for(let i = 0; i < words.length; i++){
+            if(ctx.message.text == "" || ctx.message.text == null) continue;
+    
+            if(ctx.message.text.toLowerCase().includes(words[i].toLowerCase()) == true){
+                ctx.telegram.deleteMessage(ctx.chat.id, ctx.message.message_id);
+                ctx.reply(`"@${ctx.message.from.username}" -> Вы испольозвали запрещенное слово: "${words[i]}". У вас добавлено одно прогрешение [1/3]`);
+            }
+        }
+    }
+    
+
+    
 
 });
 
