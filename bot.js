@@ -31,7 +31,7 @@ bot.on('text', async (ctx) => {
             if(isStatusSet){
                 console.log(`UserId: ${user.id} - status joined to database`);
             }
-            ctx.reply(`Вы явно дольше находитесь в этом чате. Это очень уважительно. Спасибо, что вы являетесь частью нашего чата! Я вас занес в базу данных.`, 
+            ctx.reply(`Вы явно дольше находитесь в этом чате, чем я. Это очень уважительно! Спасибо, что вы являетесь частью нашего чата! Я вас занес в базу данных.`, 
             {
                 reply_to_message_id: ctx.message.message_id
             });
@@ -220,7 +220,7 @@ bot.on('text', async (ctx) => {
                     let userMuteTime = await db.addTimeMuteFromUser(ctx.message.reply_to_message.from.id, addTime)
 
                     if(userMuteTime == true){
-                        ctx.reply(`"@${ctx.message.reply_to_message.from.username}" -> Вы замучены на ${time}мин. [1/3]`);
+                        ctx.reply(`"@${ctx.message.reply_to_message.from.username}" -> Вы замучены на ${time}мин.`);
 
                         //Устанавливаем стату muted - сообщая о том, что юзер замучен
                         let isStatusSet = db.setStatusUserId(ctx.message.reply_to_message.from.id, "muted")
