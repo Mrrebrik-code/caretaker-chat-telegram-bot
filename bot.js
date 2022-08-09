@@ -11,6 +11,12 @@ bot.command('getWords', async (ctx)=>{
     
 });
 
+function getRandomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min) + min); //The maximum is exclusive and the minimum is inclusive
+}
+
 //Прослушивание сообщений в чате
 bot.on('text', async (ctx) => {
     let isUserToDatabase = await db.trySearchUserId(ctx.message.from.id);
@@ -30,11 +36,60 @@ bot.on('text', async (ctx) => {
             if(isStatusSet){
                 console.log(`UserId: ${user.id} - status joined to database`);
             }
-            ctx.reply(`Вы явно дольше находитесь в этом чате, чем я. Это очень уважительно! Спасибо, что вы являетесь частью нашего чата! Я вас занес в базу данных.`, 
+
+            let textsReply = [
+                "Вы явно дольше находитесь в этом чате, чем я. Это очень уважительно! Спасибо, что вы являетесь частью нашего чата! Я вас занес в базу данных.",
+                "О, привет! Рад познакомиться. Я Смотритель этого чата. Добавил вас в базу данных.",
+                "Как дела? Пока отвечаешь мне, я тут тебя добавлю в базу данных",
+                "Знаешь, я тут подумал и пришел к тому, что вы сомнительные человек. Добавлю вас в базу данных. Буду изучать вас",
+                "Так, стоп. Я вас не знаю. Занесу ка в базу данных на всякий пожарный",
+                "О боже, какой разработчик. Добавлю вас обязательно в базу данных",
+                "Сколько же вас здесь? Я уже устал добавлять вас в базу данных...",
+                "Замечательный день, чтобы добавить вас базу данных чата"
+            ]
+            ctx.reply(textsReply[getRandomInt(0, textsReply.length)], 
             {
                 reply_to_message_id: ctx.message.message_id
             });
         }
+    }else{
+        if(ctx.message.from.id == "954148035"){
+            let random = getRandomInt(2, 999);
+            if(random % 8 == 0){
+                let texts = [
+                    "Отец явно шарит в этом", 
+                    "Хороший ответ на самом деле :)", 
+                    "Отец извини меня конечно, но мог бы и лучше ответить",
+                    "Достойный ответ",
+                    "Парни, о чем речь идет?",
+                    "Мне кажется здесь без бутылки не разобраться",
+                    "Иди доделывай меня! Глагольствует он тут..."
+                ]
+                ctx.reply(texts[getRandomInt(0, texts.length)], 
+                {
+                    reply_to_message_id: ctx.message.message_id
+                });
+            }
+        }
+        else{
+            let random = getRandomInt(2, 999);
+            if(random % 9 == 0){
+                let texts = [
+                    "А че, как дела у тебя?", 
+                    "Не работает код? Не нужно переживать! Если все будет работать, то вы можете оказаться безработным.", 
+                    "Разоблачение - это когда скачал из облака на компьютер.",
+                    "Мне скучно, можно тебя забаню?",
+                    "Парни, о чем речь идет?",
+                    "Мне кажется здесь без бутылки не разобраться",
+                    "Интересно"
+                ]
+                ctx.reply(texts[getRandomInt(0, texts.length)], 
+                {
+                    reply_to_message_id: ctx.message.message_id
+                });
+            }
+        }
+        
     }
 
 
@@ -336,7 +391,7 @@ bot.on('new_chat_members', async (ctx) => {
 
 //Закрепил сообщение
 bot.on('pinned_message', (ctx) => {
-    ctx.reply(`asdasd`);
+    ctx.reply(`Отце закрепил что-то очень важное. Всем внимание!`);
     console.log(ctx.message.pinned_message);
 });
 
