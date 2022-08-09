@@ -76,18 +76,21 @@ bot.on('text', async (ctx) => {
                 isDeleteMessage = false;
     
                 //TODO Сделать добавление в базу данных
-                if(ctx.message.from.id == "954148035"){
-                    ctx.reply(`Отец! Я добавил очень плохое слово "${checkWord.word}"`, {
-                        reply_to_message_id: ctx.message.message_id
-                    });
+                let isAddWord = await db.addForbiddenWord(checkWord.word.toLowerCase());
+                if(isAddWord == true){
+                    ctx.reply(`Я добавил очень плохое слово "${checkWord.word}"`, { reply_to_message_id: ctx.message.message_id });
+                }else{
+                    ctx.reply(`Произошла какая-то ошибка, попробуйте снова!`);
                 }
-                else{
-                    ctx.reply(`Я добавил очень плохое слово "${checkWord.word}"`, {
-                        reply_to_message_id: ctx.message.message_id
-                    });
-                }
+                
             }else{
-                ctx.reply(`Я удалил слово "${checkWord.word}"`);
+                isRemoveWord = await db.removeForbiddenWord(checkWord.word.toLowerCase());
+
+                if(isRemoveWord == true){
+                    ctx.reply(`Я удалил слово "${checkWord.word}"`);
+                }else{
+                    ctx.reply(`Произошла какая-то ошибка, попробуйте снова!`);
+                }
             }
         }
         else{
