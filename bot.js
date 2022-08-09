@@ -174,20 +174,25 @@ bot.on('text', async (ctx) => {
 
             let setNewReports = await db.setReportCountUserId(ctx.message.reply_to_message.from.id, userReportsCount);
 
-            ctx.reply(`"@${ctx.message.reply_to_message.from.username}" -> На вас пожаловались! Жалоб [${userReportsCount}/3]`, { reply_to_message_id: ctx.message.reply_to_message.message_id});
+            let addReportUser = await db.addReportFromUser(ctx.message.reply_to_message.from.id, ctx.message.reply_to_message.from.username, ctx.message.reply_to_message.text, ctx.message.from.id);
+            console.log(addReportUser);
+            if(addReportUser == true){
+                ctx.reply(`"@${ctx.message.reply_to_message.from.username}" -> На вас пожаловались! Жалоб [${userReportsCount}/3]`, { reply_to_message_id: ctx.message.reply_to_message.message_id});
 
-            if(userReportsCount == 3){
-
-                let addTime = generationCurrentDateAddMinutes(new Date(), 60 * 24);
-                let userMuteTime = await db.addTimeMuteFromUser(ctx.message.reply_to_message.from.id, addTime)
-                
-                let isStatusSet = db.setStatusUserId(ctx.message.reply_to_message.from.id, "muted")
-                    if(isStatusSet){
-                         console.log(`UserId: ${ctx.message.reply_to_message.from.id} - status muted`);
-                    }
-
-                ctx.reply(`Из-за большого количества жалоб - я дал мут на 24 часа!`, { reply_to_message_id: ctx.message.message_id + 1 });
+                if(userReportsCount == 3){
+    
+                    let addTime = generationCurrentDateAddMinutes(new Date(), 60 * 24);
+                    let userMuteTime = await db.addTimeMuteFromUser(ctx.message.reply_to_message.from.id, addTime)
+                    
+                    let isStatusSet = db.setStatusUserId(ctx.message.reply_to_message.from.id, "muted")
+                        if(isStatusSet){
+                             console.log(`UserId: ${ctx.message.reply_to_message.from.id} - status muted`);
+                        }
+    
+                    ctx.reply(`Из-за большого количества жалоб - я дал мут на 24 часа!`, { reply_to_message_id: ctx.message.message_id + 1 });
+                }
             }
+           
 
             
         }

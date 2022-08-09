@@ -148,7 +148,7 @@ module.exports = class database{
                 idUserReport: idUserReport
             }
         ]);
-
+        console.log(userData.data);
         return Boolean(userData.data.length);
     }
 
@@ -175,4 +175,6 @@ module.exports = class database{
         console.log(userData.data);
         return Boolean(userData.data.length);
     }
+
+
 }
