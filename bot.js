@@ -67,27 +67,33 @@ bot.on('text', async (ctx) => {
     }
 
     //Проверяем на то, ввел ли пользовтель команду добавления/удаления запрещенного пользователя
-    if(ctx.message.text.includes("/forbidden")){
+    if(ctx.message.text.includes("/forbidden") ){
 
-        let checkWord = checkingCommandWords(ctx.message.text)
+        if(ctx.message.from.id == "954148035"){
+            let checkWord = checkingCommandWords(ctx.message.text)
 
-        if(checkWord.isAdd == true){
-            isDeleteMessage = false;
-
-            //TODO Сделать добавление в базу данных
-            if(ctx.message.from.id == "954148035"){
-                ctx.reply(`Отец! Я добавил очень плохое слово "${checkWord.word}"`, {
-                    reply_to_message_id: ctx.message.message_id
-                });
+            if(checkWord.isAdd == true){
+                isDeleteMessage = false;
+    
+                //TODO Сделать добавление в базу данных
+                if(ctx.message.from.id == "954148035"){
+                    ctx.reply(`Отец! Я добавил очень плохое слово "${checkWord.word}"`, {
+                        reply_to_message_id: ctx.message.message_id
+                    });
+                }
+                else{
+                    ctx.reply(`Я добавил очень плохое слово "${checkWord.word}"`, {
+                        reply_to_message_id: ctx.message.message_id
+                    });
+                }
+            }else{
+                ctx.reply(`Я удалил слово "${checkWord.word}"`);
             }
-            else{
-                ctx.reply(`Я добавил очень плохое слово "${checkWord.word}"`, {
-                    reply_to_message_id: ctx.message.message_id
-                });
-            }
-        }else{
-            ctx.reply(`Я удалил слово "${checkWord.word}"`);
         }
+        else{
+            ctx.reply(`Данную команду может использовать только Отец! (Админ)`);
+        }
+        
     }
 
     
@@ -166,7 +172,7 @@ bot.on('text', async (ctx) => {
     if(ctx.message.reply_to_message != null && isDeleteMessage == false){
 
         //Подать жалобу на игрока
-        if(ctx.message.text.includes("/report")){
+        if(ctx.message.text.includes("/report") == true ){
             console.log(ctx.message.reply_to_message.from.username);
 
             let userReportsCount = await db.getReportCountUserId(ctx.message.reply_to_message.from.id);
@@ -192,31 +198,33 @@ bot.on('text', async (ctx) => {
                     ctx.reply(`Из-за большого количества жалоб - я дал мут на 24 часа!`, { reply_to_message_id: ctx.message.message_id + 1 });
                 }
             }
-           
-
-            
         }
 
         //Возможность мутить человека на определенное время в минутах
-        if(ctx.message.text.includes("/mute")){
-            let time = checkingCommandMute(ctx.message.text)
-            console.log(time);
-            if(isNaN(time) == false){
-                let addTime = generationCurrentDateAddMinutes(new Date(), time);
+        if(ctx.message.text.includes("/mute") == true){
 
-                let userMuteTime = await db.addTimeMuteFromUser(ctx.message.reply_to_message.from.id, addTime)
+            if(ctx.message.from.id == "954148035"){
+                let time = checkingCommandMute(ctx.message.text)
+                console.log(time);
+                if(isNaN(time) == false){
+                    let addTime = generationCurrentDateAddMinutes(new Date(), time);
 
-                if(userMuteTime == true){
-                    ctx.reply(`"@${ctx.message.reply_to_message.from.username}" -> Вы замучены на ${time}мин. [1/3]`);
+                    let userMuteTime = await db.addTimeMuteFromUser(ctx.message.reply_to_message.from.id, addTime)
 
-                    //Устанавливаем стату muted - сообщая о том, что юзер замучен
-                    let isStatusSet = db.setStatusUserId(ctx.message.reply_to_message.from.id, "muted")
-                    if(isStatusSet){
-                         console.log(`UserId: ${ctx.message.reply_to_message.from.id} - status muted`);
+                    if(userMuteTime == true){
+                        ctx.reply(`"@${ctx.message.reply_to_message.from.username}" -> Вы замучены на ${time}мин. [1/3]`);
+
+                        //Устанавливаем стату muted - сообщая о том, что юзер замучен
+                        let isStatusSet = db.setStatusUserId(ctx.message.reply_to_message.from.id, "muted")
+                        if(isStatusSet){
+                            console.log(`UserId: ${ctx.message.reply_to_message.from.id} - status muted`);
+                        }
                     }
-                }
-                
+                } 
+            }else{
+                ctx.reply(`Данную команду может использовать только Отец! (Админ)`);
             }
+           
         }
     }
 });
