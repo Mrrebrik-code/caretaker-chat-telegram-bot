@@ -13,7 +13,6 @@ bot.command('getWords', async (ctx)=>{
 
 //Прослушивание сообщений в чате
 bot.on('text', async (ctx) => {
-    
     let isUserToDatabase = await db.trySearchUserId(ctx.message.from.id);
 
     if(isUserToDatabase == false){
@@ -181,7 +180,12 @@ bot.on('text', async (ctx) => {
 
         //Подать жалобу на игрока
         if(ctx.message.text.includes("/report") == true ){
+            if(ctx.message.reply_to_message.from.is_bot == true){
+                ctx.reply(`А ты забавный :) Хочешь забаню?`, { reply_to_message_id: ctx.message.message_id});
+                return;
+            } 
             console.log(ctx.message.reply_to_message.from.username);
+            
 
             let userReportsCount = await db.getReportCountUserId(ctx.message.reply_to_message.from.id);
             userReportsCount += 1;
@@ -337,7 +341,6 @@ bot.on('pinned_message', (ctx) => {
 });
 
 bot.on('reply_to_message', (ctx) => {
-    ctx.reply(`reply_to_message`);
     console.log(ctx.message.reply_to_message);
 });
 

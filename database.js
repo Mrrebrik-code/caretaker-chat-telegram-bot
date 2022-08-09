@@ -170,8 +170,7 @@ module.exports = class database{
         .from('users-chat')
         .select('userReportCount')
         .eq('userId', userId);
-        
-        console.log(userData.data[0].userReportCount);
+
         return userData.data[0].userReportCount;
     }
 
