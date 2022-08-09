@@ -87,6 +87,17 @@ module.exports = class database{
         return Boolean(wordData.data.length);
     }
 
+    async getAllForbiddenWords(){
+        let supabase = this.supabase;
+
+        let wordsData = await supabase
+        .from('words')
+        .select('word');
+
+        console.log(wordsData.data);
+        return wordsData.data;
+    }
+
     async addTimeMuteFromUser(idUser, time){
         let supabase = this.supabase;
 

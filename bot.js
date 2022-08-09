@@ -4,9 +4,12 @@ const { Telegraf, Markup, Scenes, Stage, session } = require('telegraf');
 const moment = require('moment-timezone');
 
 const db = new database();
+
 const bot = new Telegraf(process.env.TOKEN_BOT);
 
-const words = ["Война", "Жопа", "Свинья"];
+bot.command('getWords', async (ctx)=>{
+    
+});
 
 //Прослушивание сообщений в чате
 bot.on('text', async (ctx) => {
@@ -103,10 +106,13 @@ bot.on('text', async (ctx) => {
 
     //Удаление сообщений запрещенных
     if(isDeleteMessage == true){
+
+        let words = await db.getAllForbiddenWords();
+
         for(let i = 0; i < words.length; i++){
             if(ctx.message.text == "" || ctx.message.text == null) continue;
     
-            if(ctx.message.text.toLowerCase().includes(words[i].toLowerCase()) == true){
+            if(ctx.message.text.toLowerCase().includes(words[i].word.toLowerCase()) == true){
                 ctx.telegram.deleteMessage(ctx.chat.id, ctx.message.message_id);
 
                 let countWordReport = await db.getWordReportCountUserId(ctx.message.from.id);
@@ -127,7 +133,7 @@ bot.on('text', async (ctx) => {
                 if(countWordReport >= 4) { maxCount = 6; punishment = "Мут на 24 часа!"; }
                 if(countWordReport >= 7) { maxCount = 9; punishment = "Бан на всегда!"; }
 
-                ctx.reply(`@${ctx.message.from.username} -> Вы испольозвали запрещенное слово: "${words[i]}". У вас добавлено одно прогрешение [${countWordReport}/${maxCount}]. Наказнание будет: ${punishment}`);
+                ctx.reply(`@${ctx.message.from.username} -> Вы испольозвали запрещенное слово: "${words[i].word}". У вас добавлено одно прогрешение [${countWordReport}/${maxCount}]. Наказнание будет: ${punishment}`);
 
                 if(timeMute > 0){
                     let addTime = generationCurrentDateAddMinutes(new Date(), timeMute);
@@ -163,9 +169,8 @@ bot.on('text', async (ctx) => {
                     }
 
                     ctx.reply(textReply, { reply_to_message_id: ctx.message.message_id + 1 });
-
-                    
                 }
+                break;
             }
         }
         isDeleteMessage = false;
@@ -290,6 +295,8 @@ function checkingCommandWords(inputCheck){
     return data
 }
 
+
+
 //Новый пользователь в чате
 bot.on('new_chat_members', async (ctx) => {
     //Объект пользователя для базы данных
@@ -347,6 +354,8 @@ bot.on('left_chat_member', (ctx) => {
 
     console.log(ctx.message.left_chat_member)
 });
+
+
 
 bot.launch();
 console.log("Started telegram bot!")
