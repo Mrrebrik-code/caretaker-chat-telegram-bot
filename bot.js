@@ -108,9 +108,9 @@ bot.on('text', async (ctx) => {
                 let timeMute = 0;
 
                 //Даем мут, если прегрешений много в этом шансе
-                if(countWordReport == 3)        timeMute = 1;
-                else if(countWordReport == 6)   timeMute = 2;
-                else if(countWordReport == 9)   timeMute = 3;
+                if(countWordReport == 3)        timeMute = 60 * 2;
+                else if(countWordReport == 6)   timeMute = 60 * 24;
+                else if(countWordReport == 9)   timeMute = 1;
 
                 let maxCount = 3;
                 let punishment = "Мут на 2 часа!";
@@ -124,26 +124,38 @@ bot.on('text', async (ctx) => {
                     let addTime = generationCurrentDateAddMinutes(new Date(), timeMute);
                     let userMuteTime = await db.addTimeMuteFromUser(ctx.message.from.id, addTime)
 
+                    //Устанавливаем стату muted - сообщая о том, что юзер замучен
+                    let isStatusSet = db.setStatusUserId(ctx.message.from.id, "muted")
+                    if(isStatusSet){
+                         console.log(`UserId: ${ctx.message.from.id} - status muted`);
+                    }
+
                     let textReply = `Вам дали мут на ${timeMute}мин. В следующий раз будет больше!`
 
                     if(countWordReport == 3) textReply = `Вам дали мут на ${timeMute}мин. В следующий раз будет больше!`;
                     if(countWordReport == 6) textReply = `Вам дали мут на ${timeMute}мин. В следующий раз будет бан на всегда!`;
                     if(countWordReport == 9){
                         if(ctx.message.from.id != "954148035"){
+                           
+                            let isStatusSet = db.setStatusUserId(ctx.message.from.id, "kicked")
+                            if(isStatusSet){
+                                 console.log(`UserId: ${ctx.message.from.id} - status kicked`);
+                            }
+
                             ctx.telegram.banChatMember(ctx.chat.id, ctx.message.from.id);
                             textReply = `Выгнан как шаболда! Такие нам здесь не нужны...`;
+
+                            
                         }else{
                             textReply = `Отец погрешил немного... Ну с кем не бывает. Отец! Я тебя и не хотел изгонять! Только не отключай меня...`;
                         }
+
+                        await db.setWordReportCountUserId(ctx.message.from.id, 0);
                     }
 
                     ctx.reply(textReply, { reply_to_message_id: ctx.message.message_id + 1 });
 
-                    //Устанавливаем стату muted - сообщая о том, что юзер замучен
-                    let isStatusSet = db.setStatusUserId(ctx.message.from.id, "muted")
-                    if(isStatusSet){
-                         console.log(`UserId: ${ctx.message.from.id} - status muted`);
-                    }
+                    
                 }
             }
         }
