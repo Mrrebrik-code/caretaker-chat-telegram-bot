@@ -6,7 +6,6 @@ module.exports = class database{
         console.log("Initialized database!");
     }
 
-
     async addNewUser(user){
         let supabase = this.supabase;
 
@@ -129,6 +128,48 @@ module.exports = class database{
         let userData = await supabase
         .from('users-chat')
         .update({ "wordReportCount": count })
+        .eq('userId', userId)
+
+        console.log(userData.data);
+        return Boolean(userData.data.length);
+    }
+
+    async addReportFromUser(userId, username, message, idUserReport){
+        let supabase = this.supabase;
+
+        let userData = await supabase
+        .from('reports-users')
+        .insert(
+        [ 
+            { 
+                idUser: userId,
+                username: username,
+                message: message,
+                idUserReport: idUserReport
+            }
+        ]);
+
+        return Boolean(userData.data.length);
+    }
+
+    async getReportCountUserId(userId){
+        let supabase = this.supabase;
+
+        let userData = await supabase
+        .from('users-chat')
+        .select('userReportCount')
+        .eq('userId', userId);
+        
+        console.log(userData.data[0].userReportCount);
+        return userData.data[0].userReportCount;
+    }
+
+    async setReportCountUserId(userId, count){
+        let supabase = this.supabase;
+
+        let userData = await supabase
+        .from('users-chat')
+        .update({ "userReportCount": count })
         .eq('userId', userId)
 
         console.log(userData.data);

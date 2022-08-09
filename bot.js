@@ -168,7 +168,28 @@ bot.on('text', async (ctx) => {
         //Подать жалобу на игрока
         if(ctx.message.text.includes("/report")){
             console.log(ctx.message.reply_to_message.from.username);
-            ctx.reply(`"@${ctx.message.reply_to_message.from.username}" -> На вас пожаловались! Это значит вы что-то себя ведете хреново. Нужно подумать над вашем поведением. У вас добавлено жалоба [1/5]. Если наберете все 5, мы вас кикнем! Но прежде Отце проверит. Может жалоба фальшифка!`);
+
+            let userReportsCount = await db.getReportCountUserId(ctx.message.reply_to_message.from.id);
+            userReportsCount += 1;
+
+            let setNewReports = await db.setReportCountUserId(ctx.message.reply_to_message.from.id, userReportsCount);
+
+            ctx.reply(`"@${ctx.message.reply_to_message.from.username}" -> На вас пожаловались! Жалоб [${userReportsCount}/3]`, { reply_to_message_id: ctx.message.reply_to_message.message_id});
+
+            if(userReportsCount == 3){
+
+                let addTime = generationCurrentDateAddMinutes(new Date(), 60 * 24);
+                let userMuteTime = await db.addTimeMuteFromUser(ctx.message.reply_to_message.from.id, addTime)
+                
+                let isStatusSet = db.setStatusUserId(ctx.message.reply_to_message.from.id, "muted")
+                    if(isStatusSet){
+                         console.log(`UserId: ${ctx.message.reply_to_message.from.id} - status muted`);
+                    }
+
+                ctx.reply(`Из-за большого количества жалоб - я дал мут на 24 часа!`, { reply_to_message_id: ctx.message.message_id + 1 });
+            }
+
+            
         }
 
         //Возможность мутить человека на определенное время в минутах
@@ -195,23 +216,23 @@ bot.on('text', async (ctx) => {
     }
 });
 
-    //Сгенерировать текущую дату и добавить к ней количество минут
-    //Выдат дату в определенном формате: "YYYY-MM-DD HH:mm:ss [GMT]ZZ"
-    function generationCurrentDateAddMinutes(date, addTime) {
+//Сгенерировать текущую дату и добавить к ней количество минут
+//Выдат дату в определенном формате: "YYYY-MM-DD HH:mm:ss [GMT]ZZ"
+function generationCurrentDateAddMinutes(date, addTime) {
 
-        date.setTime(date.getTime() + (addTime * 60 * 1000));
-        date.setHours(date.getHours());
-        var addTime = date, zone = "Asia/Tomsk";
-        var m = moment(addTime);
+    date.setTime(date.getTime() + (addTime * 60 * 1000));
+    date.setHours(date.getHours());
+    var addTime = date, zone = "Asia/Tomsk";
+    var m = moment(addTime);
 
-        moment.fn.zoneName = function () {
-            var abbr = this.zoneAbbr();
-            return abbrs[abbr] || abbr;
-        };
+    moment.fn.zoneName = function () {
+        var abbr = this.zoneAbbr();
+        return abbrs[abbr] || abbr;
+    };
 
-        console.log(m.format('YYYY-MM-DD HH:mm:ss [GMT]ZZ'));
-        return m.format('YYYY-MM-DD HH:mm:ss [GMT]ZZ');
-      }
+    console.log(m.format('YYYY-MM-DD HH:mm:ss [GMT]ZZ'));
+    return m.format('YYYY-MM-DD HH:mm:ss [GMT]ZZ');
+}
 
 //Проверка на добавление времени к муту пользователя
 function checkingCommandMute(inputCheck){
@@ -255,8 +276,6 @@ function checkingCommandWords(inputCheck){
 
 //Новый пользователь в чате
 bot.on('new_chat_members', async (ctx) => {
-
-   
     //Объект пользователя для базы данных
     let user = {
         id: ctx.message.new_chat_members[0].id,
@@ -284,7 +303,6 @@ bot.on('new_chat_members', async (ctx) => {
         console.log(`UserId: ${user.id} - status joined`);
     }
 
-    
     console.log(ctx.message.new_chat_members)
 });
 
@@ -302,7 +320,6 @@ bot.on('reply_to_message', (ctx) => {
 
 //Пользователь покинул чат
 bot.on('left_chat_member', (ctx) => {
-
     //Устанавливаем стату leaved - сообщая о том, что юзер вышел
     let isStatusSet = db.setStatusUserId(ctx.message.left_chat_member.id, "leaved")
 
@@ -314,7 +331,6 @@ bot.on('left_chat_member', (ctx) => {
 
     console.log(ctx.message.left_chat_member)
 });
-
 
 bot.launch();
 console.log("Started telegram bot!")
