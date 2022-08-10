@@ -9,13 +9,30 @@ const ranking = new leaderboard(db);
 
 const bot = new Telegraf(process.env.TOKEN_BOT);
 
+bot.command('post', (ctx)=>{
+    ctx.telegram.deleteMessage(ctx.chat.id, ctx.message.message_id);
+    let textReply = "";
+    textReply = `https://habr.com/ru/post/${getRandomInt(540000, 600000)}/`
+    ctx.reply(`Интересная статека: ${textReply}`, markupPost);
+
+});
+
 const markupLeaderboard = Markup.inlineKeyboard([ Markup.button.callback('Удалить', 'removeLeaderboard') ]);
+const markupPost = Markup.inlineKeyboard([ Markup.button.callback('Удалить', 'removePost') ]);
 bot.action('removeLeaderboard', async (ctx) => {
     console.log(ctx.update);
 
     ctx.telegram.deleteMessage(ctx.chat.id, ctx.update.callback_query.message.message_id);
     
 });
+
+bot.action('removePost', async (ctx) => {
+    console.log(ctx.update);
+
+    ctx.telegram.deleteMessage(ctx.chat.id, ctx.update.callback_query.message.message_id);
+    
+});
+
 
 setInterval(async () => {
     bot.telegram.sendMessage("-1001279045898", "Если что, то у нас есть соревновательная таблица. Где можно посмотреть на каком вы месте! Команда: \/leaderboard");
