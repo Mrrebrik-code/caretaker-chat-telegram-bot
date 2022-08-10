@@ -1,11 +1,36 @@
 require("dotenv").config();
 const database = require("./database.js");
-const { Telegraf, Markup, Scenes, Stage, session } = require('telegraf');
+const leaderboard = require("./leaderboard.js");
+const { Telegraf, Markup, Scenes, Stage, session, Extra } = require('telegraf');
 const moment = require('moment-timezone');
 
 const db = new database();
+const ranking = new leaderboard(db);
 
 const bot = new Telegraf(process.env.TOKEN_BOT);
+
+const markupLeaderboard = Markup.inlineKeyboard([ Markup.button.callback('Удалить', 'removeLeaderboard') ]);
+bot.action('removeLeaderboard', async (ctx) => {
+    console.log(ctx.update);
+
+    ctx.telegram.deleteMessage(ctx.chat.id, ctx.update.callback_query.message.message_id);
+    
+});
+
+bot.command('leaderboard', async (ctx)=>{
+    let leaders = await ranking.getLeaderboard();
+
+    let textReply = "🏆 Рейтинг по сообщениям:\n";
+    let index = 1;
+    await leaders.forEach( element => {
+        textReply += `[${index}]. (@${element.username}) — ${element.countMessages} сообщений \n`;
+        index += 1;
+    });
+
+    ctx.reply(textReply, markupLeaderboard);
+});
+
+
 
 function getRandomInt(min, max) {
     min = Math.ceil(min);
@@ -48,6 +73,8 @@ bot.on('text', async (ctx) => {
                 reply_to_message_id: ctx.message.message_id
             });
         }
+    }else{
+        await ranking.addCountMessages(ctx.message.from.id);
     }
 
     //Разрешено ли удалаять сообщения

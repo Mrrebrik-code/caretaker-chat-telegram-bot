@@ -25,6 +25,8 @@ module.exports = class database{
             }
         ]);
 
+        await this.createUserToLeaderboard(user);
+
         return Boolean(userData.data.length);
     }
 
@@ -186,5 +188,56 @@ module.exports = class database{
         return Boolean(userData.data.length);
     }
 
+    async setCountMessagesToUserId(userId, count){
+        let supabase = this.supabase;
 
+        await supabase
+        .from('users-chat')
+        .update({ "countMessages": count })
+        .eq('userId', userId);
+
+        await supabase
+        .from("leaderboard")
+        .update({ "countMessages": count })
+        .eq('userId', userId);
+    }
+
+    async getCountMessagesToUserId(userId){
+        let supabase = this.supabase;
+
+        let userData = await supabase
+        .from('users-chat')
+        .select('countMessages')
+        .eq('userId', userId);
+        
+        console.log(userData.data[0].countMessages);
+        return userData.data[0].countMessages;
+    }
+
+    async getUsersToLeaderboard(){
+        let supabase = this.supabase;
+
+        let leaders = await supabase
+        .from('leaderboard')
+        .select('firstName, username, countMessages')
+        .order('countMessages',  {ascending: true} );
+
+        return leaders.data;
+    }
+
+    async createUserToLeaderboard(user){
+        let supabase = this.supabase;
+
+        let userData = await supabase
+        .from('leaderboard')
+        .insert(
+        [ 
+            { 
+                userId: user.id,
+                firstName: user.firstname,
+                username: user.username,
+                countMessages: 0,
+            }
+        ]);
+    }
 }
