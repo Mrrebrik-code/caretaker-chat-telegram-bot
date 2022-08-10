@@ -17,9 +17,14 @@ bot.action('removeLeaderboard', async (ctx) => {
     
 });
 
+setInterval(() => {
+    bot.telegram.sendMessage("-1001279045898", "Если что, то у нас есть соревновательная таблица. Где можно посмотреть на каком вы месте! Команда: \/leaderboard");
+}, 2000000);
+
 bot.command('leaderboard', async (ctx)=>{
     ctx.telegram.deleteMessage(ctx.chat.id, ctx.message.message_id);
     let leaders = await ranking.getLeaderboard();
+    console.log(ctx.chat.id);
 
     let textReply = "🏆 Рейтинг по сообщениям:\n";
     let index = 1;
