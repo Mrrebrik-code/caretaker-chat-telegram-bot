@@ -43,7 +43,7 @@ setInterval(async () => {
     let textReply = "🏆 Рейтинг по сообщениям:\n";
     let index = 1;
     await leadersSorting.forEach( element => {
-        textReply += `[${index}]. (@${element.username}) — ${element.countMessages} сообщений \n`;
+        textReply += `[${index}]. ($${element.username}) — ${element.countMessages} сообщений \n`;
         index += 1;
     });
 
@@ -75,7 +75,49 @@ bot.command('leaderboard', async (ctx)=>{
     let textReply = "🏆 Рейтинг по сообщениям:\n";
     let index = 1;
     await leadersSorting.forEach( element => {
-        textReply += `[${index}]. (@${element.username}) — ${element.countMessages} сообщений \n`;
+        if(index == 1){
+            if(ctx.message.from.id == element.userId){
+                textReply += `[${index}]. 🥇@${element.username} — ${element.countMessages} сообщений \n`;
+            }
+            else{
+                textReply += `[${index}]. 🥇${element.username} — ${element.countMessages} сообщений \n`;
+            }
+             
+        }else if(index == 2){
+            if(ctx.message.from.id == element.userId){
+                textReply += `[${index}]. 🥈@${element.username} — ${element.countMessages} сообщений \n`;
+            }else{
+                textReply += `[${index}]. 🥈${element.username} — ${element.countMessages} сообщений \n`;
+            }
+        }
+        else if(index == 3){
+            if(ctx.message.from.id == element.userId){
+                textReply += `[${index}]. 🥉@${element.username} — ${element.countMessages} сообщений \n`;
+            }else{
+                textReply += `[${index}]. 🥉${element.username} — ${element.countMessages} сообщений \n`;
+            }
+        }
+        else if(index == 4){
+            if(ctx.message.from.id == element.userId){
+                textReply += `[${index}]. 4️⃣@${element.username} — ${element.countMessages} сообщений \n`;
+            }else{
+                textReply += `[${index}]. 4️⃣${element.username} — ${element.countMessages} сообщений \n`;
+            }
+        }
+        else if(index == 5){
+            if(ctx.message.from.id == element.userId){
+                textReply += `[${index}]. 5️⃣@${element.username} — ${element.countMessages} сообщений \n`;
+            }else{
+                textReply += `[${index}]. 5️⃣${element.username} — ${element.countMessages} сообщений \n`;
+            }
+        }
+        else{
+            if(ctx.message.from.id == element.userId){
+                textReply += `[${index}]. @${element.username} — ${element.countMessages} сообщений \n`;
+            }
+           
+        }
+       
         index += 1;
     });
 

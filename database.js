@@ -219,7 +219,7 @@ module.exports = class database{
 
         let leaders = await supabase
         .from('leaderboard')
-        .select('firstName, username, countMessages');
+        .select('userId, firstName, username, countMessages');
 
         return leaders.data;
     }
