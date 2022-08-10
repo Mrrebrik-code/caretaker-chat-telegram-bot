@@ -29,16 +29,33 @@ setInterval(async () => {
     });
 
     bot.telegram.sendMessage("-1001279045898", textReply, markupLeaderboard);
-}, 2000000);
+}, 4000000);
+
+function bubble(arr) {
+    var len = arr.length;
+  
+    for (var i = 0; i < len ; i++) {
+      for(var j = 0 ; j < len - i - 1; j++){ // this was missing
+      if (parseInt(arr[j].countMessages) > parseInt(arr[j + 1].countMessages)) {
+        // swap
+        var temp = arr[j];
+        arr[j] = arr[j+1];
+        arr[j + 1] = temp;
+      }
+     }
+    }
+    return arr;
+  }
 
 bot.command('leaderboard', async (ctx)=>{
     ctx.telegram.deleteMessage(ctx.chat.id, ctx.message.message_id);
     let leaders = await ranking.getLeaderboard();
+    let leadersSorting = bubble(leaders).reverse();
     console.log(ctx.chat.id);
 
     let textReply = "🏆 Рейтинг по сообщениям:\n";
     let index = 1;
-    await leaders.forEach( element => {
+    await leadersSorting.forEach( element => {
         textReply += `[${index}]. (@${element.username}) — ${element.countMessages} сообщений \n`;
         index += 1;
     });
@@ -89,8 +106,6 @@ bot.on('text', async (ctx) => {
             //     reply_to_message_id: ctx.message.message_id
             // });
         }
-    }else{
-        await ranking.addCountMessages(ctx.message.from.id);
     }
 
     //Разрешено ли удалаять сообщения
@@ -121,6 +136,8 @@ bot.on('text', async (ctx) => {
 
             let clearMute = await db.addTimeMuteFromUser(ctx.message.from.id, "false")
         }
+    }else{
+        await ranking.addCountMessages(ctx.message.from.id);
     }
 
     //Проверяем на то, ввел ли пользовтель команду добавления/удаления запрещенного пользователя
