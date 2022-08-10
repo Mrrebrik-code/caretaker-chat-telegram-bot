@@ -17,8 +17,18 @@ bot.action('removeLeaderboard', async (ctx) => {
     
 });
 
-setInterval(() => {
+setInterval(async () => {
     bot.telegram.sendMessage("-1001279045898", "Если что, то у нас есть соревновательная таблица. Где можно посмотреть на каком вы месте! Команда: \/leaderboard");
+    let leaders = await ranking.getLeaderboard();
+
+    let textReply = "🏆 Рейтинг по сообщениям:\n";
+    let index = 1;
+    await leaders.forEach( element => {
+        textReply += `[${index}]. (@${element.username}) — ${element.countMessages} сообщений \n`;
+        index += 1;
+    });
+
+    bot.telegram.sendMessage("-1001279045898", textReply, markupLeaderboard);
 }, 2000000);
 
 bot.command('leaderboard', async (ctx)=>{
