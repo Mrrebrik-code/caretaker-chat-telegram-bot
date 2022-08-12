@@ -33,23 +33,6 @@ bot.action('removePost', async (ctx) => {
     
 });
 
-
-setInterval(async () => {
-    bot.telegram.sendMessage("-1001279045898", "Если что, то у нас есть соревновательная таблица. Где можно посмотреть на каком вы месте! Команда: \/leaderboard");
-    
-    let leaders = await ranking.getLeaderboard();
-    let leadersSorting = bubble(leaders).reverse();
-
-    let textReply = "🏆 Рейтинг по сообщениям:\n";
-    let index = 1;
-    await leadersSorting.forEach( element => {
-        textReply += `[${index}]. ($${element.username}) — ${element.countMessages} сообщений \n`;
-        index += 1;
-    });
-
-    bot.telegram.sendMessage("-1001279045898", textReply, markupLeaderboard);
-}, 4000000);
-
 function bubble(arr) {
     var len = arr.length;
   
